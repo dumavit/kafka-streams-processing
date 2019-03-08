@@ -23,7 +23,7 @@ object DummyStreamingApp extends App {
 
   val builder = new StreamsBuilder
 
-  val testStream = builder.stream[String, String]("weather_data")
+  /*val testStream = builder.stream[String, String]("weather_data")
 
   testStream.foreach { (k, v) =>
     logger.info(s"record processed $k->$v")
@@ -37,7 +37,23 @@ object DummyStreamingApp extends App {
 
   sys.addShutdownHook {
     streams.close(10, TimeUnit.SECONDS)
-  }
+  }*/
+
+  implicit val weatherSerde: Serde[Weather] = fromFn(View.serialize _, Weather.deserialize _)
+  implicit val panelSerde: Serde[Panel] = fromFn(Panel.serialize _, Panel.deserialize _)
+  implicit val panelResultSerde: Serde[PanelResult] = fromFn(PanelResult.serialize _, PanelResult.deserialize _)
+
+  val builder = new StreamsBuilder
+  val panels = builder.stream[String, Panel]("panel-data")
+    .selectKey((_, panel) => panel.location)
+  val weather: KTable[String, Weather] = builder.stream[String, Weather]("weather_data")
+    .groupBy((_, weather) => weather.location)
+    .reduce((prev, next) => {if (next.time > prev.time) next else prev})
+  val result = panels.leftJoin(weather)((_, weather) => PanelResult(weather.data, weather.location))
+
+  result.to("panel-result")
+  val topology = builder.build()
+  topology
 
   object Config {
     val KafkaBrokers = "KAFKA_BROKERS"
