@@ -17,10 +17,10 @@ class PlantManagerActor(
     (for (_ <- 1 to Config.PanelCount) yield Location(1,1)).toList
 
   // todo - populate a list of panels on this plant
-  lazy val panelToActorRef: Map[String, ActorRef] =
+  val panelToActorRef: Map[String, ActorRef] =
     (for (i <- 1 to Config.PanelCount)
       yield "SolarPanel" + i -> context.actorOf(
-        Props(classOf[SolarPanelActor], "panel" + i, locations(i))
+        Props(classOf[SolarPanelActor], "panel" + i, locations(i - 1))
       )).toMap
 
   override def preStart(): Unit = {
@@ -34,6 +34,8 @@ class PlantManagerActor(
 }
 
 object Config {
-  val SensorsCount = 10
-  val PanelCount = 10
+  val SensorsCount = 3
+  val PanelCount = 50
+  val Locations = List(
+    Location(20, 20), Location(30, 30), Location(40, 40), Location(50, 50), Location(60, 60))
 }

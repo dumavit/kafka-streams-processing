@@ -5,4 +5,4 @@ import ua.ucu.edu.???
 /**
   * To be used as a message in device topic
   */
-case class SensorRecord(panelId: ???, location: ???, measurement: ???)
+case class SensorRecord(panelId: String, location: Location, measurements: Map[String, Double])

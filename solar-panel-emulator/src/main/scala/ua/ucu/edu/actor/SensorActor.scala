@@ -7,7 +7,8 @@ import ua.ucu.edu.model.{ReadMeasurement, RespondMeasurement}
 import scala.language.postfixOps
 
 class SensorActor(
-  val deviceId: String
+  val deviceId: String,
+  val sensorType: String
 ) extends Actor with ActorLogging {
 
   val api: SensorApi = new SensorGenerator
@@ -20,6 +21,6 @@ class SensorActor(
   override def receive: Receive = {
     case ReadMeasurement =>
       log.info("Received Read Measurement message")
-      sender() ! RespondMeasurement(deviceId, api.readCurrentValue)
+      sender() ! RespondMeasurement(deviceId, api.readCurrentValue, sensorType)
   }
 }

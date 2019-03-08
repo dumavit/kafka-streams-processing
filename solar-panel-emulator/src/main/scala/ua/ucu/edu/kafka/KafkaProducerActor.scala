@@ -8,7 +8,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import ua.ucu.edu.model.RespondMeasurement
 
 class KafkaProducerActor(val producerId: String) extends Actor with ActorLogging {
-  val brokerList: String = System.getenv(Config.KafkaBrokers)
+  val brokerList: String = "127.0.0.1:9201"//System.getenv(Config.KafkaBrokers)
   val topic = "sensor-data"
   val props = new Properties()
   props.put("bootstrap.servers", brokerList)
@@ -23,13 +23,13 @@ class KafkaProducerActor(val producerId: String) extends Actor with ActorLogging
   }
 
   override def receive: Receive = {
-    case RespondMeasurement(id, value) =>
-      log.info(s"Received respond for producer, $id, $value")
+    case RespondMeasurement(id, value, sensorType) =>
+      log.info(s"Received respond for producer, $id, $value, $sensorType")
       producer.send(new ProducerRecord[String, String](topic, id, value))
       log.info(s"Message sent")
   }
 }
 
 object Config {
-  val KafkaBrokers = "KAFKA_BROKERS"
+  val KafkaBrokers = "127.0.0.1:9201"//"KAFKA_BROKERS"
 }
