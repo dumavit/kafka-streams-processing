@@ -24,6 +24,10 @@ val commonDependencies = Seq(
   "junit" % "junit" % "4.12" % Test
 )
 
+val additionalDependencies = Seq(
+  "com.typesafe.play" %% "play-json" % "2.6.13"
+)
+
 val streamsDependencies = Seq(
   "org.apache.kafka" %% "kafka-streams-scala" % "2.0.1" withSources(),
   "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar"),
@@ -72,9 +76,7 @@ lazy val solar_panel_emulator = (project in file("solar-panel-emulator"))
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
     name := "solar-panel-emulator",
-    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ Seq(
-      // your additional dependencies go here
-    ),
+    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
     dockerSettings()
   )
 
@@ -82,9 +84,7 @@ lazy val weather_provider = (project in file("weather-provider"))
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
     name := "weather-provider",
-    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ Seq(
-      // your additional dependencies go here
-    ),
+    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
     dockerSettings()
   )
 
@@ -92,9 +92,7 @@ lazy val streaming_app = (project in file("streaming-app"))
   .enablePlugins(sbtdocker.DockerPlugin)
   .settings(
     name := "streaming-app",
-    libraryDependencies ++= commonDependencies ++ streamsDependencies ++ Seq(
-      // your additional dependencies go here
-    ),
+    libraryDependencies ++= commonDependencies ++ streamsDependencies ++ additionalDependencies,
     dockerSettings(),
     mainClass in assembly := Some("ua.ucu.edu.DummyStreamingApp")
   )

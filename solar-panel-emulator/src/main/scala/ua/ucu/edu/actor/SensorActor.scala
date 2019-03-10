@@ -4,8 +4,6 @@ import akka.actor.{Actor, ActorLogging}
 import ua.ucu.edu.device.{SensorApi, SensorGenerator}
 import ua.ucu.edu.model.{ReadMeasurement, RespondMeasurement}
 
-import scala.language.postfixOps
-
 class SensorActor(
   val deviceId: String,
   val sensorType: String
@@ -14,7 +12,7 @@ class SensorActor(
   val api: SensorApi = new SensorGenerator
 
   override def preStart(): Unit = {
-    log.info(s"========== $deviceId starting ===========")
+    log.info(s"========== $deviceId with type $sensorType starting ===========")
     super.preStart()
   }
 
@@ -22,5 +20,6 @@ class SensorActor(
     case ReadMeasurement =>
       log.info("Received Read Measurement message")
       sender() ! RespondMeasurement(deviceId, api.readCurrentValue, sensorType)
+    case _ => log.info(s"$deviceId received unexpected message")
   }
 }

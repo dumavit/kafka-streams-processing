@@ -1,16 +1,15 @@
 package ua.ucu.edu.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import akka.pattern.{AskTimeoutException, ask}
+import akka.pattern.ask
 import akka.util.Timeout
-import ua.ucu.edu.kafka.KafkaProducerActor
-import ua.ucu.edu.model.{Location, ReadMeasurement, RespondMeasurement, SensorTypes}
+import ua.ucu.edu.kafka.SolarPanelKafkaProducer
+import ua.ucu.edu.model._
 
 import scala.concurrent.ExecutionContext.Implicits._
-import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 /**
@@ -24,13 +23,11 @@ class SolarPanelActor(
   private val sensorTypes: List[String] = List(SensorTypes.WIND_SPEED, SensorTypes.EFFICIENCY, SensorTypes.SOLAR_FACTOR)
   // todo - initialize device actors
   private val deviceToActorRef: Map[String, ActorRef] =
-    (for (i <- 1 to Config.SensorsCount)
-      yield "Sensor" + i -> context.actorOf(Props(classOf[SensorActor], "sensor" + i, sensorTypes(i-1)))).toMap
-
-  private val kafkaProducerActor = "producer1" -> context.actorOf(Props(classOf[KafkaProducerActor], "producer1"))
+    (for (i <- 1 to ActorConfig.SensorsCount)
+      yield "Sensor" + i -> context.actorOf(Props(classOf[SensorActor], "Sensor" + i, sensorTypes(i-1)))).toMap
 
   override def preStart(): Unit = {
-    log.info(s"========== $panelId starting ===========")
+    log.info(s"========== $panelId with location $location starting ===========")
     super.preStart()
 
     // todo - schedule measurement reads
@@ -38,27 +35,20 @@ class SolarPanelActor(
       context.dispatcher, self)
   }
 
-//  import context.dispatcher
-
   override def receive: Receive = {
     case ReadMeasurement =>
       implicit val timeout: Timeout = 5.seconds
-      log.info("Received schedule trigger")
+      log.info(s"$panelId received schedule trigger")
       Future.sequence(deviceToActorRef.values.map(_ ? ReadMeasurement))
         .mapTo[List[RespondMeasurement]]
         .onComplete {
-          case Success(results) => log.info(s"$results")
-          case Failure(exception) => log.info(s"Received exception, $exception")
+          case Success(results: List[RespondMeasurement]) =>
+            log.info(s"$results")
+            SolarPanelKafkaProducer.pushData(
+              SensorRecord(panelId, location, results.map(v => v.sensorType -> v.value).toMap)
+            )
+          case Failure(exception) => log.info(s"$panelId received exception, $exception")
         }
-//      for (i <- 1 to Config.SensorsCount) {
-//        ask(deviceToActorRef(s"Sensor$i"), ReadMeasurement).mapTo[RespondMeasurement].onComplete{
-//          case Success(value: RespondMeasurement) =>
-//            log.info(s"Received respond, ${value.deviceId}, ${value.value}, ${value.sensorType}")
-//            kafkaProducerActor._2 ! value
-//          case Failure(exception) =>
-//            log.info(s"Received exception, $exception")
-//        }
-//      }
-    // todo handle measurement respond and push it to kafka
+    case _ => log.info(s"$panelId received unexpected message")
   }
 }

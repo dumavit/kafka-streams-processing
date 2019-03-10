@@ -6,5 +6,5 @@ import ua.ucu.edu.actor.PlantManagerActor
 
 object Main extends App {
   implicit val system: ActorSystem = ActorSystem()
-  system.actorOf(Props(classOf[PlantManagerActor], "plant1"), "plant1-manager")
+  system.actorOf(Props(classOf[PlantManagerActor], "Plant1"), "Plant1")
 }
