@@ -43,7 +43,7 @@ class SolarPanelActor(
         .mapTo[List[RespondMeasurement]]
         .onComplete {
           case Success(results: List[RespondMeasurement]) =>
-            log.info(s"$results")
+            log.info(s"$panelId received success response from all sensors: $results")
             SolarPanelKafkaProducer.pushData(
               SensorRecord(panelId, location, results.map(v => v.sensorType -> v.value).toMap)
             )

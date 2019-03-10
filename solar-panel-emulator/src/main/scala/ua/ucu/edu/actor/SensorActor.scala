@@ -18,8 +18,8 @@ class SensorActor(
 
   override def receive: Receive = {
     case ReadMeasurement =>
-      log.info("Received Read Measurement message")
+      log.info(s"$deviceId with type $sensorType received ReadMeasurement message")
       sender() ! RespondMeasurement(deviceId, api.readCurrentValue, sensorType)
-    case _ => log.info(s"$deviceId received unexpected message")
+    case _ => log.info(s"$deviceId with type $sensorType received unexpected message")
   }
 }
