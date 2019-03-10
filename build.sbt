@@ -72,8 +72,16 @@ lazy val root = (project in file("."))
   .settings(name := "streaming-ucu-final-project")
   .aggregate(solar_panel_emulator, weather_provider, streaming_app)
 
+lazy val shared_models = (project in file("shared-models"))
+  .settings(
+    name := "shared-models",
+    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
+    dockerSettings()
+  )
+
 lazy val solar_panel_emulator = (project in file("solar-panel-emulator"))
   .enablePlugins(sbtdocker.DockerPlugin)
+  .dependsOn(shared_models)
   .settings(
     name := "solar-panel-emulator",
     libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
@@ -82,6 +90,7 @@ lazy val solar_panel_emulator = (project in file("solar-panel-emulator"))
 
 lazy val weather_provider = (project in file("weather-provider"))
   .enablePlugins(sbtdocker.DockerPlugin)
+  .dependsOn(shared_models)
   .settings(
     name := "weather-provider",
     libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
@@ -90,6 +99,7 @@ lazy val weather_provider = (project in file("weather-provider"))
 
 lazy val streaming_app = (project in file("streaming-app"))
   .enablePlugins(sbtdocker.DockerPlugin)
+  .dependsOn(shared_models)
   .settings(
     name := "streaming-app",
     libraryDependencies ++= commonDependencies ++ streamsDependencies ++ additionalDependencies,
