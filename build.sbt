@@ -100,7 +100,7 @@ lazy val weather_provider = (project in file("weather-provider"))
 
 lazy val streaming_app = (project in file("streaming-app"))
   .enablePlugins(sbtdocker.DockerPlugin)
-  .dependsOn(shared_models)
+  .dependsOn(shared_models, solar_panel_emulator, weather_provider)
   .settings(
     name := "streaming-app",
     libraryDependencies ++= commonDependencies ++ streamsDependencies ++ additionalDependencies,

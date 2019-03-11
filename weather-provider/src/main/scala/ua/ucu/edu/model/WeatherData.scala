@@ -5,4 +5,4 @@ import ua.ucu.edu._
 /**
   * To be used as a record in kafka topic
   */
-case class WeatherData(location: ???, temperature: ???, humidity: ???)
+case class WeatherData(location: Location, temperature: Double, humidity: Double)
