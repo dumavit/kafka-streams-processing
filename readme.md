@@ -215,6 +215,25 @@ docker run --net=host --rm confluentinc/cp-kafka:5.1.0 kafka-topics --create --t
 
 ### Produce/consume topic
 
+Kafkacat `consume` doesn't show all messages in topic (or I did not configure it properly), so it's better to attach to docker container and consume it with kafka:
+
+- Get Kafka's container_id
+```
+docker ps | grep confluentinc/cp-enterprise-kafka
+```
+- Attach to Kafka's container
+```
+docker exec -it ${container_id} bash
+```
+- Change current folder
+```
+cd /usr/bin
+```
+- Listen to the topic (or use any other Kafka functionality)
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic ${topic_name} --from-beginning
+```
+
 Or you can use https://github.com/edenhill/kafkacat tool as well, e.g.:
 
 #### consume
