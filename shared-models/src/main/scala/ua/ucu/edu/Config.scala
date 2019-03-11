@@ -15,4 +15,5 @@ object Config {
     Location(52.520008, 13.404954),  // Berlin
     Location(40.416775, -3.703790)  // Madrid
   )
+  val DateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 }

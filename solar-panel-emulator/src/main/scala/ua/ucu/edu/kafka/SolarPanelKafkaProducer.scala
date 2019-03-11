@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import ua.ucu.edu.model.{SensorRecord, SensorRecordSerializer}
 
 object SolarPanelKafkaProducer {
-  val brokerList: String = "localhost:9092"//System.getenv(Config.KafkaBrokers)
+  val brokerList: String = System.getenv(Config.KafkaBrokers)
   val topic = "sensor-data"
   val props = new Properties()
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)

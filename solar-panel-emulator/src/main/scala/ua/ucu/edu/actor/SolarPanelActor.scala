@@ -3,6 +3,7 @@ package ua.ucu.edu.actor
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
+import org.joda.time.{DateTime, DateTimeZone}
 import ua.ucu.edu.kafka.SolarPanelKafkaProducer
 import ua.ucu.edu.model._
 
@@ -45,7 +46,11 @@ class SolarPanelActor(
           case Success(results: List[RespondMeasurement]) =>
             log.info(s"$panelId received success response from all sensors: $results")
             SolarPanelKafkaProducer.pushData(
-              SensorRecord(panelId, location, results.map(v => v.sensorType -> v.value).toMap)
+              SensorRecord(
+                panelId,
+                location,
+                results.map(v => v.sensorType -> v.value).toMap,
+                DateTime.now().withZone(DateTimeZone.UTC))
             )
           case Failure(exception) => log.info(s"$panelId received exception, $exception")
         }

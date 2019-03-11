@@ -25,7 +25,8 @@ val commonDependencies = Seq(
 )
 
 val additionalDependencies = Seq(
-  "com.typesafe.play" %% "play-json" % "2.6.13"
+  "com.typesafe.play" %% "play-json" % "2.6.13",
+  "com.typesafe.play" %% "play-json-joda" % "2.6.0-RC1"
 )
 
 val streamsDependencies = Seq(
