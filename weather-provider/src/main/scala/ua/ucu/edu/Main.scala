@@ -29,12 +29,11 @@ object Main extends App {
         val weatherResult: Future[WeatherRecord] = WeatherProvider.weatherAtLocation(location)
 
         weatherResult onComplete {
-          case Success(record: WeatherRecord) => {
+          case Success(record: WeatherRecord) =>
+            logger.info(s"Schedule triggered, push record $record")
             WeatherDataKafkaProducer.pushData(record)
-          }
-          case Failure(error) => {
-            println("An error has occurred: " + error.getMessage)
-          }
+          case Failure(error) =>
+            logger.error("An error has occurred: " + error.getMessage)
         }
       })
     }
