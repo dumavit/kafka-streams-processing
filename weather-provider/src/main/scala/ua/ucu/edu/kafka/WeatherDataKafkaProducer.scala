@@ -14,7 +14,7 @@ object WeatherDataKafkaProducer {
   logger.info("Initialize weather producer")
 
   val brokerList: String = System.getenv(Config.KafkaBrokers)
-  val topic = "weather_data"
+  val topic = "weather-data"
   val props = new Properties()
 
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
