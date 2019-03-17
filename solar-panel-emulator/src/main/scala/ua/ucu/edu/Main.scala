@@ -1,10 +1,10 @@
 package ua.ucu.edu
 
 import akka.actor._
-
-import ua.ucu.edu.actor.PlantManagerActor
+import ua.ucu.edu.actor.{ActorConfig, PlantManagerActor}
 
 object Main extends App {
   implicit val system: ActorSystem = ActorSystem()
-  system.actorOf(Props(classOf[PlantManagerActor], "Plant1"), "Plant1")
+  for (i <- 1 to ActorConfig.PlantCount)
+    system.actorOf(Props(classOf[PlantManagerActor], "Plant" + i), "Plant" + i)
 }

@@ -25,7 +25,8 @@ class SolarPanelActor(
   // todo - initialize device actors
   private val deviceToActorRef: Map[String, ActorRef] =
     (for (i <- 1 to ActorConfig.SensorsCount)
-      yield "Sensor" + i -> context.actorOf(Props(classOf[SensorActor], "Sensor" + i, sensorTypes(i-1)))).toMap
+      yield panelId + ":Sensor" + i -> context.actorOf(
+        Props(classOf[SensorActor], panelId + ":Sensor" + i, sensorTypes(i-1)))).toMap
 
   override def preStart(): Unit = {
     log.info(s"========== $panelId with location $location starting ===========")
