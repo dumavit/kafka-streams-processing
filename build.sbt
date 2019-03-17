@@ -15,7 +15,7 @@ val akkaVersion = "2.5.20"
 
 val commonDependencies = Seq(
   "org.apache.kafka" %% "kafka" % "2.1.0" withSources()
-    exclude("org.slf4j","slf4j-log4j12")
+    exclude("org.slf4j", "slf4j-log4j12")
     exclude("javax.jms", "jms")
     exclude("com.sun.jdmk", "jmxtools")
     exclude("com.sun.jmx", "jmxri"),
@@ -26,7 +26,9 @@ val commonDependencies = Seq(
 
 val additionalDependencies = Seq(
   "com.typesafe.play" %% "play-json" % "2.6.13",
-  "com.typesafe.play" %% "play-json-joda" % "2.6.0-RC1"
+  "com.typesafe.play" %% "play-json-joda" % "2.6.0-RC1",
+  "com.typesafe.akka" %% "akka-http" % "10.1.7",
+  "com.typesafe.akka" %% "akka-stream" % "2.5.19"
 )
 
 val streamsDependencies = Seq(
@@ -35,7 +37,7 @@ val streamsDependencies = Seq(
   "org.apache.kafka" % "kafka-streams-test-utils" % "2.0.1" % Test
 )
 
-val akkaDependencies = Seq (
+val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
   "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
@@ -63,7 +65,7 @@ def dockerSettings(debugPort: Option[Int] = None) = Seq(
       repository = name.value,
       tag = Some(s"${sys.env("STUDENT_NAME")}-${version.value}")
     )
-//    , ImageName(s"rickerlyman/${name.value}:latest")
+    //    , ImageName(s"rickerlyman/${name.value}:latest")
   )
 )
 
@@ -94,10 +96,7 @@ lazy val weather_provider = (project in file("weather-provider"))
   .dependsOn(shared_models)
   .settings(
     name := "weather-provider",
-    libraryDependencies ++= commonDependencies ++
-      akkaDependencies ++
-      additionalDependencies ++
-      Seq( "org.dispatchhttp" %% "dispatch-core" % "1.0.0"),
+    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
     dockerSettings()
   )
 
