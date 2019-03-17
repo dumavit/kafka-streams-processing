@@ -94,7 +94,10 @@ lazy val weather_provider = (project in file("weather-provider"))
   .dependsOn(shared_models)
   .settings(
     name := "weather-provider",
-    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ additionalDependencies,
+    libraryDependencies ++= commonDependencies ++
+      akkaDependencies ++
+      additionalDependencies ++
+      Seq( "org.dispatchhttp" %% "dispatch-core" % "1.0.0"),
     dockerSettings()
   )
 
