@@ -9,8 +9,28 @@ import org.apache.kafka.streams.scala.StreamsBuilder
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 
+object DummyStreamingApp extends App {
+  val brokerList: String = System.getenv(Config.KafkaBrokers)//"localhost:9092"
+  val topic = "sensor-data"
+  val props = new Properties()
+  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
+  props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streaming-app-1")
+  props.put(StreamsConfig.RETRIES_CONFIG, "5")
 
-class StreamingApp {
+  val topology = joinWeatherAndPanelData()
+
+  val streams: KafkaStreams = new KafkaStreams(topology, props)
+  streams.cleanUp()
+  streams.start()
+
+  sys.ShutdownHookThread {
+    streams.close()
+  }
+
+  object Config {
+    val KafkaBrokers = "KAFKA_BROKERS"
+  }
+
   def joinWeatherAndPanelData(): Topology = {
     implicit val sensorRecordSerde: Serde[SensorRecord] =
       Serdes.serdeFrom(new SensorRecordSerializer, new SensorRecordDeserializer)
@@ -31,7 +51,7 @@ class StreamingApp {
           s"${weatherRecord.location.latitude}:${weatherRecord.location.longitude}"
       )(Serialized.`with`(Serdes.serdeFrom(classOf[String]), weatherRecordSerde))
       .reduce(
-        (prev, next) =>
+        (_, next) =>
           next
       )(Materialized.`with`(Serdes.serdeFrom(classOf[String]), weatherRecordSerde))
 
@@ -43,29 +63,5 @@ class StreamingApp {
 
     val topology = builder.build()
     topology
-  }
-}
-
-object StreamingApp extends App {
-  val brokerList: String = System.getenv(Config.KafkaBrokers)//"localhost:9092"
-  val topic = "sensor-data"
-  val props = new Properties()
-  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-  props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streaming-app-1")
-  props.put(StreamsConfig.RETRIES_CONFIG, "5")
-
-  val app = new StreamingApp
-  val topology = app.joinWeatherAndPanelData()
-
-  val streams: KafkaStreams = new KafkaStreams(topology, props)
-  streams.cleanUp()
-  streams.start()
-
-  sys.ShutdownHookThread {
-    streams.close()
-  }
-
-  object Config {
-    val KafkaBrokers = "KAFKA_BROKERS"
   }
 }
