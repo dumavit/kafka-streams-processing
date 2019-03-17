@@ -25,7 +25,6 @@ object Main extends App {
 
   system.scheduler.schedule(5 seconds, 30 seconds, new Runnable {
     override def run(): Unit = {
-      // logger.debug("weather request")
       Config.Locations.foreach(location => {
         val weatherResult: Future[WeatherRecord] = WeatherProvider.weatherAtLocation(location)
 
