@@ -1,6 +1,7 @@
 package ua.ucu.edu
 
 import java.util.Properties
+import java.util.concurrent.TimeUnit
 
 import org.apache.kafka.streams.kstream._
 import ua.ucu.edu.model._
@@ -10,12 +11,14 @@ import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 import org.apache.kafka.common.serialization.{Serde, Serdes}
 
 object DummyStreamingApp extends App {
-  val brokerList: String = System.getenv(Config.KafkaBrokers)//"localhost:9092"
   val topic = "sensor-data"
   val props = new Properties()
-  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
+  props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, System.getenv(Config.KafkaBrokers))
   props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streaming-app-1")
-  props.put(StreamsConfig.RETRIES_CONFIG, "5")
+  props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, Long.box(5 * 1000))
+  props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, Long.box(0))
+
+  Thread.sleep(30000)
 
   val topology = joinWeatherAndPanelData()
 
@@ -24,7 +27,7 @@ object DummyStreamingApp extends App {
   streams.start()
 
   sys.ShutdownHookThread {
-    streams.close()
+    streams.close(10, TimeUnit.SECONDS)
   }
 
   object Config {
