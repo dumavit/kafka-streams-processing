@@ -58,7 +58,7 @@ object DummyStreamingApp extends App {
           next
       )(Materialized.`with`(Serdes.serdeFrom(classOf[String]), weatherRecordSerde))
 
-    sensorData.leftJoin(weatherData)((sensorRecord, weatherRecord) => {
+    sensorData.join(weatherData)((sensorRecord, weatherRecord) => {
       MergedRecord(sensorRecord.panelId, sensorRecord.location, sensorRecord.measurements,
         sensorRecord.timestamp, weatherRecord.temperature, weatherRecord.humidity)
     })(Joined.`with`(Serdes.serdeFrom(classOf[String]), sensorRecordSerde, weatherRecordSerde))

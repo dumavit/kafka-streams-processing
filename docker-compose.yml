@@ -46,6 +46,7 @@ services:
       - kafka
     environment:
       KAFKA_BROKERS: kafka:9092
+      ZK_CONNECT: zookeeper:2181
 
   weather-provider:
     image: ${REGISTRY_URI}/ucu-class/weather-provider:${STUDENT_NAME}-0.1
