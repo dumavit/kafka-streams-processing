@@ -18,7 +18,7 @@ object DummyStreamingApp extends App {
   props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, Long.box(5 * 1000))
   props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, Long.box(0))
 
-  Thread.sleep(30000)
+  Thread.sleep(40000)
 
   val topology = joinWeatherAndPanelData()
 
